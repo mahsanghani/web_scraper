@@ -2,25 +2,24 @@ package main
 
 import (
 	"fmt"
+	"github.com/PuerkitoBio/goquery"
 	"net/http"
 	"strings"
 	"time"
-
-	"github.com/PuerkitoBio/goquery"
 )
 
 func getListing(listingURL string) []string {
+
 	var links []string
-	//HTTP client with timeout
 	client := &http.Client{
 		Timeout: 30 * time.Second,
 	}
+
 	request, err := http.NewRequest("GET", listingURL, nil)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	//Setting headers
 	request.Header.Set("pragma", "no-cache")
 	request.Header.Set("cache-control", "no-cache")
 	request.Header.Set("dnt", "1")
@@ -38,17 +37,14 @@ func getListing(listingURL string) []string {
 			link, _ := s.Attr("href")
 			link = "https://yelp.com/" + link
 
-			// Make sure you we only fetch correct URL with corresponding title
 			if strings.Contains(link, "biz/") {
 				text := s.Text()
-				if text != "" && text != "more" { //to avoid unecessary links
+				if text != "" && text != "more" {
 					links = append(links, link)
 				}
 			}
-
 		})
 	}
-
 	return links
 }
 
